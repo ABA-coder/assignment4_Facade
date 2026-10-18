@@ -1,51 +1,38 @@
-# Покупка билета в кино на Java
+# Cinema Ticket Booking Facade in Java
 
-Это учебный проект по паттерну Facade. Он содержит **7 классов**: 4 подсистемы, 1 фасад и 2 клиента. Код использует простые конструкции Java: классы, методы, `Map`, `Set`, `if` и `try/catch`. Нужна Java 17 или новее. Сторонние библиотеки не нужны.
+I made this project for Assignment 4 to show how the Facade pattern works. My example is buying a cinema ticket. The project has four subsystem classes, one facade class, and two client examples. It uses Java 17 and does not need any extra libraries.
 
-## Что делает проект
+## How my program works
 
-Пользователь `U1` имеет баланс 3000, `U2` — 500. Сеанс `S1` стоит 1200, `S2` — 900. На каждом сеансе есть места `A1` и `A2`. Фасад продаёт билет за один вызов:
+A customer chooses a show and a seat. The facade checks the show, reserves the seat, charges the customer, and creates a ticket. The client only needs one method call:
 
 ```java
 CinemaTicketFacade cinema = new CinemaTicketFacade();
 String ticket = cinema.buyTicket("U1", "S1", "A1");
 ```
 
-Фасад узнаёт фильм и цену, резервирует место, списывает деньги и выдаёт номерной текстовый билет. Если оплата не проходит, место снова становится свободным. Все данные хранятся в памяти; настоящая оплата и печать на бумаге не выполняются.
+I used two shows (`S1` and `S2`), two seats per show (`A1` and `A2`), and two customers (`U1` and `U2`). The data stays in memory. The payment and ticket are simulated; no real money is charged and nothing is printed on paper.
 
-## Классы
+## Classes
 
-| Роль | Класс | Задача |
-| --- | --- | --- |
-| Подсистема | `ShowtimeCatalog` | Проверяет сеанс, находит фильм и цену. |
-| Подсистема | `SeatManager` | Резервирует и освобождает место на конкретном сеансе. |
-| Подсистема | `PaymentService` | Проверяет баланс, списывает и возвращает деньги. |
-| Подсистема | `TicketPrinter` | Создаёт номерной билет и учитывает выданные билеты. |
-| Фасад | `CinemaTicketFacade` | Вызывает подсистемы в правильном порядке и отменяет частично выполненную покупку при ошибке. |
-| Обычный клиент | `Client` | Использует только фасад. |
-| Продвинутый клиент | `AdvancedClient` | Вызывает подсистемы напрямую и сам отвечает за их порядок и обработку ошибки. |
+| Class | What it does |
+| --- | --- |
+| `ShowtimeCatalog` | Checks the show and gives its movie title and price. |
+| `SeatManager` | Reserves a seat or makes it free again. |
+| `PaymentService` | Checks the balance, charges the customer, or refunds a charge. |
+| `TicketPrinter` | Makes a numbered text ticket. |
+| `CinemaTicketFacade` | Calls the four subsystems in the correct order. |
+| `Client` | Buys a ticket through the facade. |
+| `AdvancedClient` | Uses the subsystem classes directly, without the facade. |
 
-Подсистемы публичные и **не содержат ссылок на фасад**. Их можно использовать напрямую. Обычный `Client` не создаёт подсистемы и не вызывает их методы.
+I kept the subsystem classes public. They do not refer to `CinemaTicketFacade`, so an advanced client can still use them on its own. The regular `Client` uses only the facade.
 
-## Запуск в PowerShell
+## Clean Code choices
 
-Из папки проекта:
+1. I used names such as `buyTicket`, `reserve`, and `charge` so the methods are easy to understand.
+2. Each subsystem has one main job. The facade coordinates them instead of doing their work.
+3. The regular client has a small API: it only calls `buyTicket`.
+4. Unknown shows, occupied seats, and failed payments produce errors.
+5. If a payment fails after a seat is reserved, the facade makes the seat free again. It also refunds a charge if a later step fails.
 
-```powershell
-New-Item -ItemType Directory -Force out | Out-Null
-javac -d out (Get-ChildItem src/cinema/*.java).FullName
-java -cp out cinema.Client
-java -cp out cinema.AdvancedClient
-```
-
-Оба клиента выводят билет. Они запускаются отдельно, поэтому каждый создаёт свои новые подсистемы и начинает нумерацию с `T1`.
-
-## Clean Code для защиты
-
-1. **Понятные имена:** `buyTicket`, `reserve`, `charge`, `printTicket` говорят о действии метода.
-2. **Одна ответственность:** каталог, места, оплата и билеты разделены по классам. Фасад только координирует их.
-3. **Простой API:** обычному клиенту достаточно одного метода `buyTicket`.
-4. **Проверка ошибок:** неизвестный сеанс, занятое место и нехватка денег дают понятное исключение.
-5. **Восстановление состояния:** если покупка прерывается после резерва, фасад освобождает место; если деньги уже списаны, он возвращает их.
-
-Подробная UML-диаграмма и разбор кода по строкам находятся в [EXPLANATION.md](EXPLANATION.md). Короткое объяснение с карточками, картой связей и вопросом есть в [LEARNING_GUIDE.md](LEARNING_GUIDE.md). Проект опубликован в [репозитории assignment4_Facade](https://github.com/ABA-coder/assignment4_Facade). Уникальность темы среди одногруппников и оценка за очную защиту проверяются отдельно.
+My [UML diagram and code explanation](EXPLANATION.md) show how the classes are connected. I also wrote a [short study guide](LEARNING_GUIDE.md) to help me prepare for the defense.
