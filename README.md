@@ -34,5 +34,3 @@ I kept the subsystem classes public. They do not refer to `CinemaTicketFacade`, 
 3. The regular client has a small API: it only calls `buyTicket`.
 4. Unknown shows, occupied seats, and failed payments produce errors.
 5. If a payment fails after a seat is reserved, the facade makes the seat free again. It also refunds a charge if a later step fails.
-
-My [UML diagram and code explanation](EXPLANATION.md) show how the classes are connected. I also wrote a [short study guide](LEARNING_GUIDE.md) to help me prepare for the defense.
